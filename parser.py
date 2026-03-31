@@ -18,7 +18,8 @@ Rules:
 - Assign zone: "public" (living, dining, kitchen, study, entry), "private" (bedrooms, bathrooms), "service" (utility, store, garage)
 - Infer adjacencies: kitchen->dining, master bedroom->master bathroom, bedroom->bathroom, etc.
 - Set natural_light: true for living room, bedrooms, study. false for bathrooms, utility, store.
-- If plot dimensions not given, infer a rectangle with width:depth ratio between 1:1.2 and 1:1.5
+- If plot dimensions not given, infer a rectangle with width:depth ratio between 1:1 and 1:1.5 
+- (Imp.) Strictly Only use given size (Ex. If given 900 sft. then total used area should be <=900sft.).
 
 IMPORTANT: Return ONLY valid JSON. No markdown, no backticks, no explanation. Just the raw JSON object.
 
