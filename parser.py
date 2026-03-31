@@ -6,7 +6,9 @@ from models import StructuredBrief
 
 load_dotenv()
 
-client = Groq(api_key="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")
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+client = Groq(api_key=GROQ_API_KEY)
 SYSTEM_PROMPT = """You are an expert architectural brief parser.
 Convert the user's architectural brief into a structured JSON object.
 
