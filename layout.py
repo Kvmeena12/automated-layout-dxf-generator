@@ -30,7 +30,11 @@ def create_corridor(plot_w, plot_h):
         height=plot_h,
         zone="circulation"
     )
-
+def find_room(layout, keyword):
+    for r in layout:
+        if keyword in r.name.lower():
+            return r
+    return None
 def create_foyer():
     return RoomLayout(
         name="Foyer",
@@ -53,9 +57,27 @@ def get_room_weight(name):
         return 2
     else:
         return 1
+def enforce_adjacency(layout):
+    
+    # Kitchen → Dining
+    kitchen = find_room(layout, "kitchen")
+    dining = find_room(layout, "dining")
 
+    if kitchen and dining:
+        kitchen.x = dining.x
+        kitchen.y = dining.y + dining.height + 0.5
+
+    # Bedroom → Bathroom
+    for room in layout:
+        if "bedroom" in room.name.lower():
+            bath = find_room(layout, "bathroom")
+            if bath:
+                bath.x = room.x + room.width + 0.5
+                bath.y = room.y
+
+    return layout
 def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
-
+    
     plot_w = brief.plot_width_ft
     plot_d = brief.plot_depth_ft
 
@@ -124,6 +146,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             room_fraction = room_weight / row_total_weight
 
             rw = max(5.0, usable_width * room_fraction - WALL * 2)
+         
             if "kitchen" in room.name.lower():
                 rw = max(rw, 8)   # 🔥 kitchen must be usable
                 rx = corridor_x + corridor_width + 0.5
@@ -211,5 +234,5 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
         height=plot_d,
         zone="circulation"
     ))
-
+    layout = enforce_adjacency(layout)
     return layout
