@@ -6,7 +6,6 @@ from parser import parse_brief
 from constraints import validate_and_normalize
 from layout import generate_layout
 from cad import create_dxf
-from parser import fix_rooms
 
 st.set_page_config(page_title="Brief → Floor Plan", layout="centered")
 st.title("AI Floor Plan Generator")
