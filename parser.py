@@ -126,7 +126,6 @@ def fix_rooms(rooms):
         fixed.append(r)
 
     return fixed
-brief.rooms = fix_rooms(brief.rooms)
 def ensure_core_rooms(rooms):
     names = [r.name.lower() for r in rooms]
 
