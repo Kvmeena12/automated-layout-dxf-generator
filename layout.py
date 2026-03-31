@@ -112,10 +112,8 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
                     prev_fraction = prev_room.area_sqft / row_total_area
                     x_offset += usable_width * prev_fraction
 
-            if col==0:
                 rx = x_offset + WALL
-            else:
-                rx= x_offset+corridor_width+WALL
+        
             # Calculate cumulative row y within zone
             ry_in_zone = 0.0
             for r_idx in range(row):
