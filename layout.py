@@ -21,7 +21,7 @@ ROOM_PRIORITY = {
 }
 
 def create_corridor(plot_w, plot_h):
-    corridor_width = 4
+    corridor_width = 3
     return RoomLayout(
         name="Corridor",
         x=plot_w / 2 - corridor_width / 2,
@@ -62,7 +62,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
 
     WALL = 0.5
     corridor_width = 3
-    corridor_x = plot_w * 0.35
+    corridor_x = (plot_w - corridor_width) / 2
     usable_width = (plot_w - corridor_width) / 2
 
     zone_order = ["public", "service", "private"]
