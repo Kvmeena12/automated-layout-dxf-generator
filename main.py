@@ -6,6 +6,7 @@ from parser import parse_brief
 from constraints import validate_and_normalize
 from layout import generate_layout
 from cad import create_dxf
+from parser import fix_rooms
 
 st.set_page_config(page_title="Brief → Floor Plan", layout="centered")
 st.title("AI Floor Plan Generator")
@@ -34,8 +35,7 @@ if st.button("Generate Floor Plan", type="primary"):
     else:
         with st.spinner("Parsing brief with AI..."):
             try:
-                structured = parse_brief(brief_text)\
-                from parser import fix_rooms
+                structured = parse_brief(brief_text)
                 structured.rooms = fix_rooms(structured.rooms)
                 st.success(f"Parsed {len(structured.rooms)} rooms")
                 
