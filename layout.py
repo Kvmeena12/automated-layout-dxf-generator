@@ -44,16 +44,15 @@ def get_room_weight(name):
     name = name.lower()
 
     if "living" in name:
-        return 5
+        return 6
+    elif "kitchen" in name:
+        return 5   # 🔥 increase kitchen importance
     elif "bedroom" in name:
         return 4
-    elif "kitchen" in name:
-        return 3
     elif "bath" in name:
         return 2
     else:
         return 1
-
 
 def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
 
@@ -125,6 +124,15 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             room_fraction = room_weight / row_total_weight
 
             rw = max(5.0, usable_width * room_fraction - WALL * 2)
+            if "kitchen" in room.name.lower():
+                rw = max(rw, 8)   # 🔥 kitchen must be usable
+                rx = corridor_x + corridor_width + 0.5
+            elif "living" in room.name.lower():
+                w = max(rw, 12)
+            elif "bedroom" in room.name.lower():
+                rw = max(rw, 10)
+            elif "bath" in room.name.lower():
+                rw = max(rw, 5)
             MIN_WIDTH = {
     "living": 12,
     "bedroom": 10,
