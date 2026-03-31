@@ -122,6 +122,8 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
                 ry_in_zone += max(6.0, (prev_row_area / zone_area) * zone_h)
 
             ry = zone_y + ry_in_zone + WALL
+            if ry > plot_d:
+                continue  # skip invalid room
             rh = row_h - WALL
             if col==0:
                 rw=min(rw,corridor_x - rx - WALL)
@@ -129,6 +131,14 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
                 rw=min(rw,plot_w - rx - WALL)
             if rw<3.0:
                 continue
+            if rx < 0:
+                rx = WALL
+            if ry < 0:
+                ry = WALL
+            if rx + rw > plot_w:
+                rw = plot_w - rx - WALL
+            if ry + rh > plot_d:
+                rh = plot_d - ry - WALL
 
             layout.append(RoomLayout(
               name=room.name,
@@ -140,7 +150,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
     natural_light=room.natural_light
 ))
 
-        zone_y += zone_h + CORRIDOR
+        zone_y += zone_h
     
     layout.insert(0, create_foyer())
     layout.append(RoomLayout(
