@@ -82,10 +82,9 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
 
         zone_area = sum(r.area_sqft for r in rooms)
         # Zone height proportional to its share of total area
-       
-        zone_heights[zone]=zone_h
         total_zone_height +=zone_h
         scale_h=plot_d/total_zone_height if total_zone_height >plot_d else 1.0
+        zone_heights[zone]=zone_h
         zone_h =zone_heights[zone] * scale_h
 
         # Sort rooms by area descending — largest room gets more space
