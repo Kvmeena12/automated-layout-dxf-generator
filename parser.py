@@ -110,22 +110,7 @@ SCHEMA
   "special_constraints": [string]
 }
 """
-def fix_rooms(rooms):
-    seen = {}
-    fixed = []
 
-    for r in rooms:
-        name = r.name.lower()
-
-        # limit balcony to 1
-        if "balcony" in name:
-            if seen.get("balcony", 0) >= 1:
-                continue
-            seen["balcony"] = seen.get("balcony", 0) + 1
-
-        fixed.append(r)
-
-    return fixed
 def ensure_core_rooms(rooms):
     names = [r.name.lower() for r in rooms]
 
