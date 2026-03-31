@@ -48,7 +48,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
 
     WALL = 0.5
     corridor_width = 3
-    corridor_x = plot_w / 2 - corridor_width / 2
+    corridor_x = plot_w * 0.35
     usable_width = (plot_w - corridor_width) / 2
 
     zone_order = ["public", "service", "private"]
