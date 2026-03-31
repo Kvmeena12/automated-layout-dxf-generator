@@ -57,7 +57,7 @@ CORE RULES (VERY IMPORTANT)
 7. PLOT DIMENSIONS
 - If not given:
   - Assume rectangular plot
-  - Maintain width:depth ratio between 1:1 and 1:1.5
+  - Maintain width:depth ratio between 1:1.1 and 1:1.5
   - Ensure area ≈ plot_width * plot_depth
 
 8. PRIORITY LOGIC
