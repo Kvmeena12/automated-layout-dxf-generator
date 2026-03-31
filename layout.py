@@ -49,7 +49,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
     WALL = 0.5
     corridor_width = 4
     corridor_x = plot_w / 2 - corridor_width / 2
-    usable_width = plot_w - corridor_width
+    usable_width = (plot_w - corridor_width) / 2
 
     zone_order = ["public", "service", "private"]
 
@@ -87,8 +87,12 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
 
         zone_h = zone_heights[zone] * scale_h
         zone_area = sum(r.area_sqft for r in rooms)
-        zone_h=*scale_h
+        
         rooms_sorted = sorted(rooms, key=lambda r: r.area_sqft, reverse=True)
+        rooms_sorted = sorted(
+    rooms_sorted,
+    key=lambda r: 0 if "bath" in r.name.lower() else 1
+)
 
         cols = 2 if len(rooms_sorted) > 1 else 1
 
@@ -126,12 +130,19 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             rh = row_h - WALL
 
             # 🔥 WIDTH FIX (split by corridor)
+            left_limit = corridor_x - WALL
+            right_limit = corridor_x + corridor_width + WALL
+            
             if col == 0:
-                rw = min(rw, corridor_x - rx - WALL)
+                rx = WALL + x_offset
+                rw = min(rw, left_limit - rx)
             else:
+                rx = right_limit + x_offset
                 rw = min(rw, plot_w - rx - WALL)
 
             # 🔥 HARD BOUNDARY CHECK
+            if rx<0:
+                rx=WALL
             if rx + rw > plot_w:
                 rw = plot_w - rx - WALL
 
