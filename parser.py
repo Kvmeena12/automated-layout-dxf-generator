@@ -31,6 +31,9 @@ CORE RULES (VERY IMPORTANT)
 - Avoid very small or zero-area rooms
 
 3. NO OVERLAP LOGIC
+- The layout must fully fit inside the plot rectangle
+- Total layout width must not exceed plot_width_ft
+- Total layout depth must not exceed plot_depth_ft
 - Rooms must be realistic in size
 - Avoid too many rooms for small total area
 - If area is small → reduce number of rooms
