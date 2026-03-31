@@ -94,7 +94,22 @@ SCHEMA
   "special_constraints": [string]
 }
 """
+def fix_rooms(rooms):
+    seen = {}
+    fixed = []
 
+    for r in rooms:
+        name = r.name.lower()
+
+        # limit balcony to 1
+        if "balcony" in name:
+            if seen.get("balcony", 0) >= 1:
+                continue
+            seen["balcony"] = seen.get("balcony", 0) + 1
+
+        fixed.append(r)
+
+    return fixed
 def parse_brief(brief_text: str) -> StructuredBrief:
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",   # best free model on Groq for structured output
