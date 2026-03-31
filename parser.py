@@ -64,7 +64,23 @@ CORE RULES (VERY IMPORTANT)
 - Prioritize essential rooms:
   living > bedrooms > kitchen > bathroom > dining > others
 - If space is limited → drop low priority rooms (study, store)
+-----------------------------------
+ROOM VALIDITY RULES (STRICT)
+-----------------------------------
 
+- Do NOT repeat same room type excessively
+- Maximum:
+  - Balcony: 1
+  - Kitchen: 1
+  - Living: 1
+- Bedrooms: based on BHK (2BHK → 2 bedrooms, etc.)
+- MUST include:
+  - Living Room
+  - At least 1 Bedroom
+  - Kitchen
+  - Bathroom
+
+If constraints conflict → prioritize essential rooms over balcony.
 -----------------------------------
 OUTPUT RULES
 -----------------------------------
