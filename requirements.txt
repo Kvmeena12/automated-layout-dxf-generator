@@ -1,0 +1,3 @@
+ezdxf
+numpy
+streamlit   # if used
