@@ -83,7 +83,54 @@ SPACE UTILIZATION RULES (STRICT)
 - Rooms should expand proportionally to fill available space.
 
 - Avoid creating narrow unused gaps or dead spaces.
+-----------------------------------
+SPATIAL PLACEMENT RULES (CRITICAL)
+-----------------------------------
 
+The layout must follow a realistic architectural flow from entrance to private areas.
+
+1. ENTRY FLOW (BOTTOM → TOP)
+- Entrance is at bottom of plot
+- Foyer must be near entrance
+- Living room must be directly connected to foyer
+- Dining should be next to living
+- Kitchen must be near dining
+
+2. ZONE POSITIONING (VERTICAL ORDER)
+- Public zone → bottom (living, dining, kitchen)
+- Service zone → middle (balcony, utility)
+- Private zone → top (bedrooms, bathrooms)
+
+3. LEFT–RIGHT BALANCING
+- Layout must be balanced on both sides of the corridor
+- Avoid placing all rooms on one side
+- Distribute rooms evenly left and right
+
+4. CORRIDOR LOGIC
+- Corridor must be central or slightly offset
+- All rooms should connect to corridor directly
+- Avoid gaps between corridor and rooms
+
+5. BEDROOM–BATHROOM LOGIC
+- Bathroom must be attached or very close to bedroom
+- Avoid placing bathroom far from bedroom
+
+6. KITCHEN POSITION
+- Kitchen must be near dining
+- Avoid placing kitchen far from living/dining
+
+7. SPACE FILLING
+- No large empty unused areas
+- If extra space exists:
+  - Expand existing rooms first
+  - Then add optional rooms (study, lounge)
+
+8. SHAPE CONSTRAINT
+- Rooms should form a compact rectangular layout
+- Avoid scattered or floating rooms
+- Avoid large gaps between rooms
+
+-----------------------------------
 -----------------------------------
 ROOM VALIDITY RULES (STRICT)
 -----------------------------------
