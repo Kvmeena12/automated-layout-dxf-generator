@@ -87,7 +87,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
 
         zone_h = zone_heights[zone] * scale_h
         zone_area = sum(r.area_sqft for r in rooms)
-
+        zone_h=*scale_h
         rooms_sorted = sorted(rooms, key=lambda r: r.area_sqft, reverse=True)
 
         cols = 2 if len(rooms_sorted) > 1 else 1
@@ -138,8 +138,11 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             if ry + rh > plot_d:
                 rh = plot_d - ry - WALL
 
-            if rw < 3 or rh < 3:
-                continue
+            if rw < 3:
+                rw = 3
+            if rh < 3:
+                rh = 3
+                
 
             layout.append(RoomLayout(
                 name=room.name,
