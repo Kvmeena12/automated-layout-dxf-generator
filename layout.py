@@ -40,6 +40,20 @@ def create_foyer():
         height=4,
         zone="public"
     )
+def get_room_weight(name):
+    name = name.lower()
+
+    if "living" in name:
+        return 5
+    elif "bedroom" in name:
+        return 4
+    elif "kitchen" in name:
+        return 3
+    elif "bath" in name:
+        return 2
+    else:
+        return 1
+
 
 def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
 
@@ -106,9 +120,20 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             row_h = max(6.0, (row_area / zone_area) * zone_h)
 
             row_total_area = sum(r.area_sqft for r in row_rooms)
-            room_fraction = room.area_sqft / row_total_area if row_total_area else 1.0 / cols
+            row_total_weight = sum(get_room_weight(r.name) for r in row_rooms)
+            room_weight = get_room_weight(room.name)
+            room_fraction = room_weight / row_total_weight
 
             rw = max(5.0, usable_width * room_fraction - WALL * 2)
+            MIN_WIDTH = {
+    "living": 12,
+    "bedroom": 10,
+    "kitchen": 8,
+    "bathroom": 5
+                )
+            for key in MIN_WIDTH:
+                if key in room.name.lower():
+                    rw = max(rw, MIN_WIDTH[key])
 
             # X position
             x_offset = 0.0
