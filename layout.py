@@ -130,7 +130,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
     "bedroom": 10,
     "kitchen": 8,
     "bathroom": 5
-                )
+            }
             for key in MIN_WIDTH:
                 if key in room.name.lower():
                     rw = max(rw, MIN_WIDTH[key])
