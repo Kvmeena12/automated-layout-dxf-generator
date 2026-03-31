@@ -20,6 +20,8 @@ Rules:
 - Set natural_light: true for living room, bedrooms, study. false for bathrooms, utility, store.
 - If plot dimensions not given, infer a rectangle with width:depth ratio between 1:1 and 1:1.5 
 - (Imp.) Strictly Only use given size (Ex. If given 900 sft. then total used area should be <=900sft.).
+-(Imp.) Any part of design should not be overlap.
+
 
 IMPORTANT: Return ONLY valid JSON. No markdown, no backticks, no explanation. Just the raw JSON object.
 
