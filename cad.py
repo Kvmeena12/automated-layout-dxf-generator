@@ -284,7 +284,7 @@ def create_dxf(brief: StructuredBrief, layout: List[RoomLayout], output_path: st
     msp.add_line((0, -4), (pw, -4),
                  dxfattribs={"layer": "WALLS", "lineweight": 15})
 
-    add_label(msp, "FLOOR PLAN  —  AI GENERATED",
+    add_label(msp, " ",
               pw / 2, -2.3, 1.3, "LABELS")
     add_label(msp,
               f"Total Area: {brief.total_area_sqft:.0f} sqft   |   "
