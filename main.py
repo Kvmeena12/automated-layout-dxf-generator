@@ -34,7 +34,9 @@ if st.button("Generate Floor Plan", type="primary"):
     else:
         with st.spinner("Parsing brief with AI..."):
             try:
-                structured = parse_brief(brief_text)
+                structured = parse_brief(brief_text)\
+                from parser import fix_rooms
+                structured.rooms = fix_rooms(structured.rooms)
                 st.success(f"Parsed {len(structured.rooms)} rooms")
                 
                 with st.expander("Parsed brief (JSON)"):
