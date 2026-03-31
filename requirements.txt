@@ -2,3 +2,4 @@ ezdxf
 numpy
 streamlit   # if used
 groq
+dotenv
