@@ -70,7 +70,7 @@ def create_foyer(plot_w, plot_h):
 
 def create_corridor(plot_w, plot_h):
     """Create central corridor"""
-    corridor_width = 3.5
+    corridor_width = 3.0
     return RoomLayout(
         name="Corridor",
         x=plot_w / 2 - corridor_width / 2,
@@ -79,6 +79,25 @@ def create_corridor(plot_w, plot_h):
         height=plot_h,
         zone="circulation"
     )
+
+def check_overlaps(layout: List[RoomLayout]) -> List[tuple]:
+    """
+    Check for overlaps between rooms
+    Returns list of overlapping room pairs
+    """
+    overlaps = []
+    for i in range(len(layout)):
+        for j in range(i + 1, len(layout)):
+            r1 = layout[i]
+            r2 = layout[j]
+            
+            # Check if rectangles overlap
+            # No overlap if one is completely left/right/above/below the other
+            if not (r1.x + r1.width <= r2.x or r2.x + r2.width <= r1.x or
+                    r1.y + r1.height <= r2.y or r2.y + r2.height <= r1.y):
+                overlaps.append((r1.name, r2.name))
+    
+    return overlaps
 
 def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
     """
@@ -101,7 +120,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
     total_area = sum(r.area_sqft for r in brief.rooms)
     
     # ===== CORRIDOR DIMENSIONS =====
-    corridor_width = 3.5
+    corridor_width = 3.0
     corridor_x = (plot_w - corridor_width) / 2
     left_width = corridor_x - WALL
     right_width = plot_w - (corridor_x + corridor_width) - WALL
@@ -172,6 +191,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             room_w = max(room.area_sqft / room_h, get_min_dimensions(room.name)["min_w"])
             room_w = min(room_w, usable_width - WALL)
             
+            # LEFT SIDE: Must be to the LEFT of corridor
             room_x = WALL
             room_y = left_y + WALL
             
@@ -184,9 +204,10 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             if room_y + room_h > zone_y + zone_h:
                 room_h = zone_y + zone_h - room_y - WALL
             
-            # Constrain to corridor boundary
-            if room_x + room_w > corridor_x - WALL:
-                room_w = corridor_x - room_x - WALL
+            # Constrain to left side boundary (before corridor)
+            max_left_x = corridor_x - WALL - 0.5
+            if room_x + room_w > max_left_x:
+                room_w = max_left_x - room_x
             
             # Ensure minimum size
             room_h = max(room_h, 5)
@@ -194,7 +215,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             
             # Final safety check - clamp all values
             room_y = max(WALL, min(room_y, plot_d - room_h - WALL))
-            room_w = min(room_w, corridor_x - room_x - WALL)
+            room_w = min(room_w, max_left_x - room_x)
             room_h = min(room_h, plot_d - room_y - WALL)
             
             if room_w >= 4 and room_h >= 4:
@@ -217,6 +238,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             room_w = max(room.area_sqft / room_h, get_min_dimensions(room.name)["min_w"])
             room_w = min(room_w, usable_width - WALL)
             
+            # RIGHT SIDE: Must be to the RIGHT of corridor
             room_x = corridor_x + corridor_width + WALL
             room_y = right_y + WALL
             
@@ -229,9 +251,10 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             if room_y + room_h > zone_y + zone_h:
                 room_h = zone_y + zone_h - room_y - WALL
             
-            # Constrain to right boundary
-            if room_x + room_w > plot_w - WALL:
-                room_w = plot_w - room_x - WALL
+            # Constrain to right boundary (after corridor)
+            max_right_x = plot_w - WALL
+            if room_x + room_w > max_right_x:
+                room_w = max_right_x - room_x
             
             # Ensure minimum size
             room_h = max(room_h, 5)
@@ -278,5 +301,12 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
         height=4,
         zone="public"
     ))
+    
+    # ===== OVERLAP DETECTION =====
+    overlaps = check_overlaps(layout)
+    if overlaps:
+        print(f"⚠️  WARNING: {len(overlaps)} overlaps detected:")
+        for r1, r2 in overlaps:
+            print(f"   - {r1} overlaps with {r2}")
     
     return layout
