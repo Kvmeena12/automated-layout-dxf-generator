@@ -47,7 +47,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
     plot_d = brief.plot_depth_ft
 
     WALL = 0.5
-    corridor_width = 4
+    corridor_width = 3
     corridor_x = plot_w / 2 - corridor_width / 2
     usable_width = (plot_w - corridor_width) / 2
 
@@ -154,7 +154,18 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             if rh < 3:
                 rh = 3
                 
-
+            for room in brief.rooms:
+                name = room.name.lower()
+                if "living" in name:
+                    room.area_sqft *= 1.4
+                elif "bedroom" in name:
+                    room.area_sqft *= 1.2
+                elif "kitchen" in name:
+                    room.area_sqft *= 1.0
+                elif "bath" in name:
+                    room.area_sqft *= 0.8
+                elif "balcony" in name:
+                    room.area_sqft *= 0.7
             layout.append(RoomLayout(
                 name=room.name,
                 x=round(rx, 2),
