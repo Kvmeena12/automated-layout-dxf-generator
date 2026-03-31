@@ -81,7 +81,10 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
 
         zone_area = sum(r.area_sqft for r in rooms)
         # Zone height proportional to its share of total area
-        zone_h = max(8.0, (zone_area / total_area) * usable_depth)
+        zone_h =zone_heights[zone] * scale_h
+        zone_heights[zone]=zone_h
+        total_zone_height +=zone_h
+   scale_h=plot_d/total_zone_height if total_zone_height >plot_d else 1.0
 
         # Sort rooms by area descending — largest room gets more space
         rooms_sorted = sorted(rooms, key=lambda r: r.area_sqft, reverse=True)
@@ -98,7 +101,6 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             row_rooms = [rooms_sorted[j] for j in range(len(rooms_sorted)) if j // cols == row]
             row_area = sum(r.area_sqft for r in row_rooms)
             row_h = max(6.0, (row_area / zone_area) * zone_h)
-
             # Column width proportional to room area vs row total
             row_total_area = sum(r.area_sqft for r in row_rooms)
             room_w_fraction = room.area_sqft / row_total_area if row_total_area > 0 else 1.0 / cols
@@ -139,6 +141,8 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
                 rw = plot_w - rx - WALL
             if ry + rh > plot_d:
                 rh = plot_d - ry - WALL
+            rw = max(3, rw)
+            rh = max(3, rh)
 
             layout.append(RoomLayout(
               name=room.name,
