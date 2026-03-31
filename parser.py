@@ -110,6 +110,28 @@ def fix_rooms(rooms):
         fixed.append(r)
 
     return fixed
+brief.rooms = fix_rooms(brief.rooms)
+def ensure_core_rooms(rooms):
+    names = [r.name.lower() for r in rooms]
+
+    def add_room(name, area, zone):
+        rooms.append(RoomLayout(
+            name=name,
+            x=0, y=0, width=0, height=0,
+            zone=zone,
+            natural_light=True
+        ))
+
+    if not any("living" in n for n in names):
+        add_room("Living Room", 120, "public")
+
+    if not any("bedroom" in n for n in names):
+        add_room("Bedroom", 100, "private")
+
+    if not any("kitchen" in n for n in names):
+        add_room("Kitchen", 70, "service")
+
+    return rooms
 def parse_brief(brief_text: str) -> StructuredBrief:
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",   # best free model on Groq for structured output
