@@ -73,7 +73,8 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
 
     total_area = sum(r.area_sqft for r in brief.rooms)
     usable_depth = plot_d - (len([z for z in zone_order if zones[z]]) - 1) * CORRIDOR
-
+    total_zone_height=0
+    zone_heights={)
     for zone in zone_order:
         rooms = zones[zone]
         if not rooms:
