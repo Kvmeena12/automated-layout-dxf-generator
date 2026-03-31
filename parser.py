@@ -2,14 +2,14 @@ import json
 import os
 from groq import Groq
 from dotenv import load_dotenv
-from models import StructuredBrief
+from models import StructuredBrief, Room
 
 load_dotenv()
 
-
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 client = Groq(api_key=GROQ_API_KEY)
-SYSTEM_PROMPT =  """You are an expert architectural brief parser.
+
+SYSTEM_PROMPT = """You are an expert architectural brief parser.
 
 Your task is to convert a user's architectural brief into a STRICT structured JSON.
 
@@ -19,16 +19,20 @@ CORE RULES (VERY IMPORTANT)
 
 1. TOTAL AREA CONSTRAINT
 - Sum of all room areas MUST be <= total_area_sqft
-- Target usage: 75%–85% of total area (leave space for walls, circulation)
+- Target usage: 75%–85% of total area (leave 15-25% for walls, circulation, corridor)
 - NEVER exceed total_area_sqft
+- Example: 1500 sqft total → allocate 1125-1275 sqft to rooms
 
 2. ROOM VALIDITY
-- Always include: living room
-- Bedrooms ≥ 90 sqft
+- Always include: living room (min 120 sqft)
+- Bedrooms ≥ 90 sqft (master ≥ 110 sqft)
 - Kitchen ≥ 60 sqft
 - Bathroom ≥ 40 sqft
 - Dining ≥ 50 sqft
-- Avoid very small or zero-area rooms
+- Study ≥ 70 sqft
+- Balcony ≥ 60 sqft
+- Avoid zero-area rooms
+- Avoid rooms under minimum size
 
 3. NO OVERLAP LOGIC
 - The layout must fully fit inside the plot rectangle
@@ -36,101 +40,113 @@ CORE RULES (VERY IMPORTANT)
 - Total layout depth must not exceed plot_depth_ft
 - Rooms must be realistic in size
 - Avoid too many rooms for small total area
-- If area is small → reduce number of rooms
+- If area is small → reduce number of rooms or reduce room sizes proportionally
 
 4. ZONING RULES
-- public: living, dining, kitchen, study, foyer
-- private: bedrooms, bathrooms
-- service: utility, store, balcony
+- public: living room, dining, kitchen, study, foyer
+- private: master bedroom, bedrooms, bathrooms
+- service: utility, store, balcony, pantry
 
 5. ADJACENCY RULES
-- kitchen → dining
-- bedroom → bathroom
-- master bedroom → attached bathroom (if possible)
-- living → dining
+- kitchen ↔ dining (must be adjacent or connected)
+- master bedroom ↔ master bathroom (attached if possible)
+- bedroom ↔ bathroom (close proximity)
+- living ↔ dining (direct connection)
+- living ↔ foyer (entrance flow)
 - Avoid random adjacencies
 
 6. NATURAL LIGHT
-- true: living, bedrooms, study
-- false: bathroom, utility, store
+- true: living, dining, bedrooms, study, foyer, balcony
+- false: bathroom, utility, store, pantry
 
 7. PLOT DIMENSIONS
-- If not given:
+- If not given, calculate from total_area_sqft:
   - Assume rectangular plot
-  - Maintain width:depth ratio between 1:1.1 and 1:1.5
-  - Ensure area ≈ plot_width * plot_depth
+  - Prefer width:depth ratio between 1:1 and 1:1.5
+  - Ensure plot_width_ft × plot_depth_ft ≈ total_area_sqft
+  - Round to nearest 5 ft
 
-8. PRIORITY LOGIC
-- Prioritize essential rooms:
-  living > bedrooms > kitchen > bathroom > dining > others
-- If space is limited → drop low priority rooms (study, store)
+8. PRIORITY LOGIC (STRICT)
+- Essential (MUST INCLUDE):
+  1. Living Room (100-150 sqft)
+  2. Bedrooms (as specified in BHK)
+  3. Kitchen (60-100 sqft)
+  4. Bathrooms (≥ 1, ideally 1 per 2 bedrooms)
+  
+- Important (INCLUDE IF SPACE ALLOWS):
+  5. Dining (50-80 sqft)
+  6. Study (70-100 sqft)
+  
+- Optional (ONLY IF EXTRA SPACE):
+  7. Balcony (60-100 sqft)
+  8. Utility/Store (40-60 sqft)
+
+- If space is limited (< 800 sqft):
+  → Drop balcony, study, utility
+  → Minimize room sizes
+  → Combined living-dining is OK
+  
+- If space is moderate (800-1500 sqft):
+  → Include dining, 1 bathroom
+  → Optional study
+  → Skip balcony/utility
+  
+- If space is large (> 1500 sqft):
+  → Include all rooms
+  → Add balcony, utility, multiple bathrooms
 
 -----------------------------------
 SPACE UTILIZATION RULES (STRICT)
 -----------------------------------
 
-- The total layout must fully utilize the available plot area.
-- Avoid leaving large unused or empty rectangular spaces.
-- Distribute rooms evenly across the plot width and depth.
+- NEVER leave empty unused rectangular spaces
+- Total room area = 75-85% of total_area_sqft
+- Remaining 15-25% = walls (0.5 ft thick) + circulation + corridor (3-3.5 ft width)
 
-- If extra space remains:
-  - Prefer adding functional rooms such as:
-    - Study
-    - Family lounge
-    - Store room
-  - Do NOT leave empty unused space.
+- If you calculate room areas and they sum to < 65% of total:
+  → Increase room sizes proportionally
+  → Add additional small rooms (study, balcony) to fill space
 
-- Rooms should expand proportionally to fill available space.
+- Rooms should NOT have extreme aspect ratios:
+  → Avoid very narrow rooms (width < 6 ft)
+  → Avoid very long rooms (length:width > 3:1)
+  → Target aspect ratio: 1.2 to 1.5
 
-- Avoid creating narrow unused gaps or dead spaces.
+- Avoid creating scattered or floating rooms
+- Maintain compact rectangular layout
+
 -----------------------------------
-SPATIAL PLACEMENT RULES (CRITICAL)
+SPATIAL PLACEMENT RULES (FOR VALIDATOR)
 -----------------------------------
 
-The layout must follow a realistic architectural flow from entrance to private areas.
+These rules guide the layout generator AFTER JSON is created:
 
 1. ENTRY FLOW (BOTTOM → TOP)
-- Entrance is at bottom of plot
-- Foyer must be near entrance
-- Living room must be directly connected to foyer
-- Dining should be next to living
-- Kitchen must be near dining
+   - Entrance at bottom
+   - Foyer near entrance
+   - Living room directly after foyer
+   - Dining next to living
+   - Kitchen near dining
 
-2. ZONE POSITIONING (VERTICAL ORDER)
-- Public zone → bottom (living, dining, kitchen)
-- Service zone → middle (balcony, utility)
-- Private zone → top (bedrooms, bathrooms)
+2. ZONE POSITIONING
+   - Public zone: bottom (living, dining, kitchen)
+   - Service zone: middle (balcony, utility)
+   - Private zone: top (bedrooms, bathrooms)
 
-3. LEFT–RIGHT BALANCING
-- Layout must be balanced on both sides of the corridor
-- Avoid placing all rooms on one side
-- Distribute rooms evenly left and right
+3. CORRIDOR LOGIC
+   - Central vertical corridor (3-3.5 ft wide)
+   - Rooms on left and right of corridor
+   - Balanced distribution left/right
 
-4. CORRIDOR LOGIC
-- Corridor must be central or slightly offset
-- All rooms should connect to corridor directly
-- Avoid gaps between corridor and rooms
+4. BEDROOM-BATHROOM LOGIC
+   - Each bedroom should have nearby bathroom
+   - Master bedroom ideally has attached bathroom
 
-5. BEDROOM–BATHROOM LOGIC
-- Bathroom must be attached or very close to bedroom
-- Avoid placing bathroom far from bedroom
+5. KITCHEN POSITION
+   - Kitchen must be adjacent to dining
+   - Kitchen near living/dining area
+   - Separate from bedrooms
 
-6. KITCHEN POSITION
-- Kitchen must be near dining
-- Avoid placing kitchen far from living/dining
-
-7. SPACE FILLING
-- No large empty unused areas
-- If extra space exists:
-  - Expand existing rooms first
-  - Then add optional rooms (study, lounge)
-
-8. SHAPE CONSTRAINT
-- Rooms should form a compact rectangular layout
-- Avoid scattered or floating rooms
-- Avoid large gaps between rooms
-
------------------------------------
 -----------------------------------
 ROOM VALIDITY RULES (STRICT)
 -----------------------------------
@@ -139,15 +155,27 @@ ROOM VALIDITY RULES (STRICT)
 - Maximum:
   - Balcony: 1
   - Kitchen: 1
-  - Living: 1
-- Bedrooms: based on BHK (2BHK → 2 bedrooms, etc.)
+  - Living room: 1
+  - Dining: 1-2 (only if large enough)
+  
+- Bedrooms:
+  - 1BHK → 1 bedroom
+  - 2BHK → 2 bedrooms
+  - 3BHK → 3 bedrooms
+  - 4BHK → 4 bedrooms
+  
+- Bathrooms:
+  - 1BHK → 1 bathroom
+  - 2BHK → 1-2 bathrooms
+  - 3BHK → 2 bathrooms
+  - 4BHK → 2-3 bathrooms
+
 - MUST include:
   - Living Room
   - At least 1 Bedroom
   - Kitchen
   - Bathroom
 
-If constraints conflict → prioritize essential rooms over balcony.
 -----------------------------------
 OUTPUT RULES
 -----------------------------------
@@ -156,98 +184,220 @@ OUTPUT RULES
 - No explanation, no markdown, no extra text
 - All fields must be filled
 - Numbers must be realistic and consistent
+- room_count = len(rooms)
+- All areas rounded to nearest integer
+- All dimensions rounded to 1 decimal place
 
 -----------------------------------
 SCHEMA
 -----------------------------------
 
 {
-  "total_area_sqft": number,
-  "plot_width_ft": number,
-  "plot_depth_ft": number,
+  "total_area_sqft": integer (>= 500),
+  "plot_width_ft": number (>= 20),
+  "plot_depth_ft": number (>= 20),
+  "room_count": integer,
   "rooms": [
     {
-      "name": string,
-      "area_sqft": number,
-      "zone": "public" or "private" or "service",
-      "adjacencies": [string],
+      "name": string (unique, no duplicates),
+      "area_sqft": integer (>= 40),
+      "zone": "public" | "private" | "service",
+      "adjacencies": [string] (list of adjacent room names),
       "natural_light": boolean
     }
   ],
-  "special_constraints": [string]
+  "special_constraints": [string] (list of special requirements)
 }
+
+VALIDATION CHECKS:
+- sum(room.area_sqft for all rooms) <= total_area_sqft
+- sum(room.area_sqft for all rooms) >= 0.65 * total_area_sqft
+- plot_width_ft * plot_depth_ft >= total_area_sqft
+- All room names are unique
+- No room area < 40 sqft
+- room_count = len(rooms)
 """
 
-def ensure_core_rooms(rooms):
-    names = [r.name.lower() for r in rooms]
+def validate_and_fix_brief(data: dict) -> dict:
+    """
+    Validate parsed brief and fix common issues
+    """
+    try:
+        total_area = data.get("total_area_sqft", 1500)
+        rooms = data.get("rooms", [])
+        
+        # ===== AREA VALIDATION =====
+        total_room_area = sum(r.get("area_sqft", 0) for r in rooms)
+        min_area = total_area * 0.65
+        max_area = total_area * 0.95
+        
+        if total_room_area > max_area:
+            # Shrink all rooms proportionally
+            scale = max_area / total_room_area
+            for room in rooms:
+                room["area_sqft"] = max(40, int(room["area_sqft"] * scale))
+        
+        elif total_room_area < min_area:
+            # Expand rooms proportionally or add optional rooms
+            scale = min_area / total_room_area
+            for room in rooms:
+                room["area_sqft"] = max(room["area_sqft"], int(room["area_sqft"] * scale))
+        
+        # ===== PLOT DIMENSIONS =====
+        plot_w = data.get("plot_width_ft")
+        plot_d = data.get("plot_depth_ft")
+        
+        if not plot_w or not plot_d:
+            # Calculate from total area
+            ratio = 1.2  # width:depth ratio
+            plot_d = (total_area / ratio) ** 0.5
+            plot_w = plot_d * ratio
+            plot_w = round(plot_w / 5) * 5  # Round to nearest 5
+            plot_d = round(plot_d / 5) * 5
+            data["plot_width_ft"] = plot_w
+            data["plot_depth_ft"] = plot_d
+        
+        # ===== ENSURE CORE ROOMS =====
+        room_names = [r["name"].lower() for r in rooms]
+        
+        if not any("living" in n for n in room_names):
+            rooms.append({
+                "name": "Living Room",
+                "area_sqft": max(120, int(total_area * 0.1)),
+                "zone": "public",
+                "adjacencies": ["Foyer", "Dining"],
+                "natural_light": True
+            })
+        
+        if not any("bedroom" in n for n in room_names):
+            rooms.append({
+                "name": "Bedroom",
+                "area_sqft": max(90, int(total_area * 0.08)),
+                "zone": "private",
+                "adjacencies": ["Bathroom"],
+                "natural_light": True
+            })
+        
+        if not any("kitchen" in n for n in room_names):
+            rooms.append({
+                "name": "Kitchen",
+                "area_sqft": max(60, int(total_area * 0.06)),
+                "zone": "service",
+                "adjacencies": ["Dining"],
+                "natural_light": False
+            })
+        
+        if not any("bath" in n for n in room_names):
+            rooms.append({
+                "name": "Bathroom",
+                "area_sqft": 45,
+                "zone": "private",
+                "adjacencies": ["Bedroom"],
+                "natural_light": False
+            })
+        
+        # ===== REMOVE DUPLICATES =====
+        seen = {}
+        unique_rooms = []
+        for room in rooms:
+            name = room["name"].lower()
+            if name not in seen:
+                seen[name] = True
+                unique_rooms.append(room)
+        
+        data["rooms"] = unique_rooms
+        data["room_count"] = len(unique_rooms)
+        
+        # ===== FINAL AREA CHECK =====
+        final_area = sum(r["area_sqft"] for r in unique_rooms)
+        if final_area > total_area:
+            # Last resort: scale everything down
+            scale = (total_area * 0.9) / final_area
+            for room in unique_rooms:
+                room["area_sqft"] = max(40, int(room["area_sqft"] * scale))
+        
+        return data
+    
+    except Exception as e:
+        print(f"Warning: validation error - {e}")
+        return data
 
-    def add_room(name, area, zone):
-        rooms.append(RoomLayout(
-            name=name,
-            x=0, y=0, width=0, height=0,
-            zone=zone,
-            natural_light=True
-        ))
-
-    if not any("living" in n for n in names):
-        add_room("Living Room", 120, "public")
-
-    if not any("bedroom" in n for n in names):
-        add_room("Bedroom", 100, "private")
-
-    if not any("kitchen" in n for n in names):
-        add_room("Kitchen", 70, "service")
-
-    return rooms
 def parse_brief(brief_text: str) -> StructuredBrief:
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",   # best free model on Groq for structured output
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": brief_text}
-        ],
-        temperature=0.1,      # low temperature = more consistent JSON output
-        max_tokens=1000,
-    )
+    """
+    Parse architectural brief using Groq LLM
+    """
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": brief_text}
+            ],
+            temperature=0.1,
+            max_tokens=1500,
+        )
 
-    raw = response.choices[0].message.content.strip()
+        raw = response.choices[0].message.content.strip()
 
-    # Strip markdown fences if model adds them
-    if raw.startswith("```"):
-        lines = raw.split("\n")
-        raw = "\n".join(lines[1:-1])
-        if raw.startswith("json"):
-            raw = raw[4:].strip()
+        # Strip markdown fences
+        if raw.startswith("```"):
+            lines = raw.split("\n")
+            raw = "\n".join(lines[1:-1])
+            if raw.startswith("json"):
+                raw = raw[4:].strip()
 
-    # Sometimes model adds text before/after the JSON — extract just the JSON object
-    start = raw.find("{")
-    end = raw.rfind("}") + 1
-    if start != -1 and end > start:
+        # Extract JSON object
+        start = raw.find("{")
+        end = raw.rfind("}") + 1
+        if start == -1 or end <= start:
+            raise ValueError("No JSON object found in response")
+        
         raw = raw[start:end]
+        data = json.loads(raw)
 
-    data = json.loads(raw)
-    return StructuredBrief(**data)
+        # Validate and fix
+        data = validate_and_fix_brief(data)
 
+        return StructuredBrief(**data)
+    
+    except json.JSONDecodeError as e:
+        print(f"JSON Parse Error: {e}")
+        print(f"Raw response: {raw[:200]}")
+        raise
+    except Exception as e:
+        print(f"Parse Error: {e}")
+        raise
 
-# Run this file directly to test your Groq key
+# Test function
 if __name__ == "__main__":
     test_briefs = [
-        "3BHK, 1500 sq ft, open kitchen, 1 study, maximize natural light",
-        "2BHK apartment, 900 sq ft, combined living and dining, 1 bathroom",
-        "4BHK villa, 3000 sq ft, master suite, formal living, large kitchen, utility room",
+        "900 sqft apartment, 2BHK, 1 bathroom, open kitchen",
+        "1500 sqft, 3BHK, 2 bathrooms, study room, balcony",
+        "3000 sqft villa, 4BHK, master suite, formal living, large kitchen, utility room",
     ]
 
     for brief in test_briefs:
-        print(f"\nBrief: {brief}")
-        print("-" * 50)
+        print(f"\n{'='*60}")
+        print(f"Brief: {brief}")
+        print(f"{'='*60}")
         try:
             result = parse_brief(brief)
-            rooms = [(r.name, f"{r.area_sqft:.0f} sqft", r.zone) for r in result.rooms]
-            for name, area, zone in rooms:
-                print(f"  {name:25s} {area:10s} [{zone}]")
-            print(f"  Plot: {result.plot_width_ft}ft x {result.plot_depth_ft}ft")
-            print("  ✓ OK")
-        except json.JSONDecodeError as e:
-            print(f"  ✗ JSON error: {e}")
+            print(f"\n📐 Plot: {result.plot_width_ft}ft × {result.plot_depth_ft}ft = {result.plot_width_ft * result.plot_depth_ft:.0f} sqft")
+            print(f"📊 Total Area: {result.total_area_sqft} sqft")
+            print(f"🏠 Rooms: {result.room_count}\n")
+            
+            total_room_area = sum(r.area_sqft for r in result.rooms)
+            print(f"Room Allocation ({total_room_area}/{result.total_area_sqft} sqft):")
+            print("-" * 60)
+            
+            for r in result.rooms:
+                pct = (r.area_sqft / result.total_area_sqft) * 100
+                print(f"  {r.name:25s} {r.area_sqft:4d} sqft ({pct:5.1f}%) [{r.zone:8s}]")
+            
+            print("-" * 60)
+            utilization = (total_room_area / result.total_area_sqft) * 100
+            print(f"Space Utilization: {utilization:.1f}%")
+            print(f"✓ VALID" if 65 <= utilization <= 95 else f"⚠ NEEDS ADJUSTMENT")
+        
         except Exception as e:
-            print(f"  ✗ Error: {e}")
+            print(f"✗ Error: {e}")
