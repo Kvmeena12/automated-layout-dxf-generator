@@ -64,6 +64,26 @@ CORE RULES (VERY IMPORTANT)
 - Prioritize essential rooms:
   living > bedrooms > kitchen > bathroom > dining > others
 - If space is limited → drop low priority rooms (study, store)
+
+-----------------------------------
+SPACE UTILIZATION RULES (STRICT)
+-----------------------------------
+
+- The total layout must fully utilize the available plot area.
+- Avoid leaving large unused or empty rectangular spaces.
+- Distribute rooms evenly across the plot width and depth.
+
+- If extra space remains:
+  - Prefer adding functional rooms such as:
+    - Study
+    - Family lounge
+    - Store room
+  - Do NOT leave empty unused space.
+
+- Rooms should expand proportionally to fill available space.
+
+- Avoid creating narrow unused gaps or dead spaces.
+
 -----------------------------------
 ROOM VALIDITY RULES (STRICT)
 -----------------------------------
