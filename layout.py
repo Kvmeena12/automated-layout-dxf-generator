@@ -235,7 +235,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
     height=room_h,
     zone=zone_name,
     natural_light=room.natural_light
-)           temp_temp_temp_room.x, temp_ temp_room.y = place_room(temp_room, placed_rooms, WALL, left_y)
+)           temp_room.x, temp_room.y = place_room(temp_room, placed_rooms, WALL, left_y)
             placed_rooms.append(temp_room)
             
             # CRITICAL: Hard boundaries - PRIORITY: STAY WITHIN PLOT
@@ -257,7 +257,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             room_w = max(room_w, 5)
             
             # Final safety check - clamp all values
-             temp_room.y = max(WALL, min( temp_room.y, plot_d - room_h - WALL))
+            temp_room.y = max(WALL, min( temp_room.y, plot_d - room_h - WALL))
             room_w = min(room_w, max_left_x - temp_room.x)
             room_h = min(room_h, plot_d -  temp_room.y - WALL)
             
