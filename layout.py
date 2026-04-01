@@ -227,37 +227,37 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             room_w = min(room_w, usable_width - WALL)
             
             # LEFT SIDE: Must be to the LEFT of corridor
-            room.x, room.y = place_room(room, placed_rooms, x, y)
+            room.x, room.y = place_room(room, placed_rooms, WALL, left_y)
             placed_rooms.append(room)
             
             # CRITICAL: Hard boundaries - PRIORITY: STAY WITHIN PLOT
             # Constrain to plot depth FIRST
-            if room_y + room_h > plot_d:
-                room_h = plot_d - room_y - WALL
+            if room.y + room_h > plot_d:
+                room_h = plot_d - room.y - WALL
             
             # Then constrain to zone
-            if room_y + room_h > zone_y + zone_h:
-                room_h = zone_y + zone_h - room_y - WALL
+            if room.y + room_h > zone_y + zone_h:
+                room_h = zone_y + zone_h - room.y - WALL
             
             # Constrain to left side boundary (before corridor)
             max_left_x = corridor_x - WALL - 0.5
-            if room_x + room_w > max_left_x:
-                room_w = max_left_x - room_x
+            if room.x + room_w > max_left_x:
+                room_w = max_left_x - room.x
             
             # Ensure minimum size
             room_h = max(room_h, 5)
             room_w = max(room_w, 5)
             
             # Final safety check - clamp all values
-            room_y = max(WALL, min(room_y, plot_d - room_h - WALL))
-            room_w = min(room_w, max_left_x - room_x)
-            room_h = min(room_h, plot_d - room_y - WALL)
+            room.y = max(WALL, min(room.y, plot_d - room_h - WALL))
+            room_w = min(room_w, max_left_x - room.x)
+            room_h = min(room_h, plot_d - room.y - WALL)
             
             if room_w >= 4 and room_h >= 4:
                 layout.append(RoomLayout(
                     name=room.name,
-                    x=round(room_x, 2),
-                    y=round(room_y, 2),
+                    x=round(room.x, 2),
+                    y=round(room.y, 2),
                     width=round(room_w, 2),
                     height=round(room_h, 2),
                     zone=zone_name,
@@ -274,38 +274,38 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             room_w = min(room_w, usable_width - WALL)
             
             # RIGHT SIDE: Must be to the RIGHT of corridor
-            room_x = corridor_x + corridor_width + WALL
-            room_y = right_y + WALL
+            room.x = corridor_x + corridor_width + WALL
+            room.y = right.y + WALL
             
             # CRITICAL: Hard boundaries - PRIORITY: STAY WITHIN PLOT
             # Constrain to plot depth FIRST
-            if room_y + room_h > plot_d:
-                room_h = plot_d - room_y - WALL
+            if room.y + room_h > plot_d:
+                room_h = plot_d - room.y - WALL
             
             # Then constrain to zone
-            if room_y + room_h > zone_y + zone_h:
-                room_h = zone_y + zone_h - room_y - WALL
+            if room.y + room_h > zone_y + zone_h:
+                room_h = zone_y + zone_h - room.y - WALL
             
             # Constrain to right boundary (after corridor)
             max_right_x = plot_w - WALL
-            if room_x + room_w > max_right_x:
-                room_w = max_right_x - room_x
+            if room.x + room_w > max_right_x:
+                room_w = max_right_x - room.x
             
             # Ensure minimum size
             room_h = max(room_h, 5)
             room_w = max(room_w, 5)
             
             # Final safety check - clamp all values
-            room_y = max(WALL, min(room_y, plot_d - room_h - WALL))
-            room_x = max(corridor_x + corridor_width + WALL, min(room_x, plot_w - room_w - WALL))
-            room_w = min(room_w, plot_w - room_x - WALL)
-            room_h = min(room_h, plot_d - room_y - WALL)
+            room.y = max(WALL, min(room.y, plot_d - room_h - WALL))
+            room.x = max(corridor_x + corridor_width + WALL, min(room.x, plot_w - room_w - WALL))
+            room_w = min(room_w, plot_w - room.x - WALL)
+            room_h = min(room_h, plot_d - room.y - WALL)
             
             if room_w >= 4 and room_h >= 4:
                 layout.append(RoomLayout(
                     name=room.name,
-                    x=round(room_x, 2),
-                    y=round(room_y, 2),
+                    x=round(room.x, 2),
+                    y=round(room.y, 2),
                     width=round(room_w, 2),
                     height=round(room_h, 2),
                     zone=zone_name,
