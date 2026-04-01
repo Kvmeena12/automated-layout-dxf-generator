@@ -15,7 +15,7 @@ st.caption("Paste an architectural brief → download a DXF floor plan")
 SAMPLES = {
     "3BHK Standard": "3BHK, 1500 sq ft, open kitchen, 1 study, maximize natural light",
     "2BHK Compact": 
-    '''Design a 2BHK floor plan (900 sq ft 1200 sq ft, 30x35 ft) using STRICT HARD CONSTRAINTS.
+    '''Design a 2BHK floor plan (900 sq ft 1200 sq ft) using STRICT HARD CONSTRAINTS.
 
 HARD AREA CONSTRAINTS (NON-NEGOTIABLE)
 
