@@ -164,6 +164,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             rooms,
             key=lambda r: (-r.area_sqft, -get_room_weight(r.name))
         )
+       
         
         # ===== LAYOUT STRATEGY: 2-COLUMN GRID =====
         # Distribute rooms across left and right of corridor
