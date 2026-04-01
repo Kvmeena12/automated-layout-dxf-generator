@@ -263,8 +263,8 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             if room_w >= 4 and room_h >= 4:
                 layout.append(RoomLayout(
                     name=room.name,
-                    x=round(temp_temp_room.x, 2),
-                    y=round( temp_room.y, 2),
+                    x=round(temp_room.x, 2),
+                    y=round(temp_room.y, 2),
                     width=round(room_w, 2),
                     height=round(room_h, 2),
                     zone=zone_name,
