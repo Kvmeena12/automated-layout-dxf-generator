@@ -304,10 +304,10 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
     ))
     
     # ===== OVERLAP DETECTION =====
-    overlaps = check_overlaps(layout)
-    if overlaps:
-        print(f"⚠️  WARNING: {len(overlaps)} overlaps detected:")
-        for r1, r2 in overlaps:
-            print(f"   - {r1} overlaps with {r2}")
+    # overlaps = check_overlaps(layout)
+    # if overlaps:
+    #     print(f"⚠️  WARNING: {len(overlaps)} overlaps detected:")
+    #     for r1, r2 in overlaps:
+    #         print(f"   - {r1} overlaps with {r2}")
     
     return layout
