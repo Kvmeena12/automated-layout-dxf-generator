@@ -177,6 +177,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
     
     # ===== PLACE ROOMS =====
     layout = []
+    placed_rooms = []
     zone_y = 0
     
     for zone_name in ["public", "service", "private"]:
