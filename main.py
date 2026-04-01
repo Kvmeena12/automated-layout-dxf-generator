@@ -6,7 +6,7 @@ from parser import parse_brief
 from constraints import validate_and_normalize
 from layout import generate_layout
 from cad import create_dxf
-
+from pipeline import run_pipeline
 st.set_page_config(page_title="Brief → Floor Plan", layout="centered")
 st.title("AI Floor Plan Generator")
 st.caption("Paste an architectural brief → download a DXF floor plan")
@@ -80,11 +80,12 @@ if st.button("Generate Floor Plan", type="primary"):
     else:
         with st.spinner("Parsing brief with AI..."):
             try:
-                structured = parse_brief(brief_text)
-                st.success(f"Parsed {len(structured.rooms)} rooms")
+                # structured = parse_brief(brief_text)
+                brief, layout, result = run_pipeline(brief_text)
+                st.success(f"Parsed {len(brief.rooms)} rooms")
                 
                 with st.expander("Parsed brief (JSON)"):
-                    st.json(structured.model_dump())
+                    st.json(brief.model_dump())
                 
             except Exception as e:
                 st.error(f"Parsing failed: {e}")
