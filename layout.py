@@ -26,28 +26,34 @@ def is_overlap(r1, r2):
         r1.y < r2.y + r2.height and
         r1.y + r1.height > r2.y
     )
-
 def place_room(room, placed_rooms, start_x, start_y):
-    x, y = start_x, start_y
+    x = start_x   # ✅ FIX
+    y = start_y   # ✅ FIX
 
     while True:
         overlap = False
 
         for r in placed_rooms:
-            if is_overlap(room, r):
+            if (
+                x < r.x + r.width and
+                x + room.width > r.x and
+                y < r.y + r.height and
+                y + room.height > r.y
+            ):
                 overlap = True
                 break
 
         if not overlap:
             return x, y
 
-        # shift right if overlap
+        # shift right
         x += 2
 
-        # if exceeds width → move to next row
+        # move to next row
         if x > 30:
             x = 0
             y += 2
+
 def get_room_weight(name):
     """Get priority weight for room sizing"""
     name = name.lower()
