@@ -20,7 +20,8 @@ def hard_constraint_check(brief):
 
 def generate_with_retry(prompt, max_retries=3):
     for attempt in range(max_retries):
-        brief = validate_and_fix_brief(prompt)
+        brief = parse_brief(prompt)              # Step 1: text → object
+        brief = validate_and_fix_brief(brief)    # Step 2: fix object
 
         valid, msg = hard_constraint_check(brief)
 
