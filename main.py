@@ -2,18 +2,16 @@
 import streamlit as st
 import tempfile
 import os
-from parser import parse_brief
-from constraints import validate_and_normalize
-from layout import generate_layout
 from cad import create_dxf
-from Pipeline import run_pipeline
+from pipeline import run_pipeline   # ✅ fix import (lowercase)
+
 st.set_page_config(page_title="Brief → Floor Plan", layout="centered")
 st.title("AI Floor Plan Generator")
 st.caption("Paste an architectural brief → download a DXF floor plan")
 
 # Sample briefs for easy demo
 SAMPLES = {
-    "3BHK Standard": "3BHK, 1500 sq ft, open kitchen, 1 study, maximize natural light",
+   "3BHK Standard": "3BHK, 1500 sq ft, open kitchen, 1 study, maximize natural light",
     "2BHK Compact": 
     '''Design a 2BHK floor plan (900 sq ft 1200 sq ft) using STRICT HARD CONSTRAINTS.
 
@@ -71,50 +69,53 @@ brief_text = st.text_area(
     "Architectural brief:",
     value=default_text,
     height=200,
-    placeholder="e.g. 3BHK, 1500 sq ft, open kitchen, 1 study, maximize natural light"
 )
 
 if st.button("Generate Floor Plan", type="primary"):
     if not brief_text.strip():
         st.error("Please enter a brief.")
     else:
-        with st.spinner("Parsing brief with AI..."):
+        with st.spinner("Generating optimized floor plan..."):
             try:
-                # structured = parse_brief(brief_text)
+                # ✅ FULL PIPELINE (ONLY THIS)
                 brief, layout, result = run_pipeline(brief_text)
+
                 st.success(f"Parsed {len(brief.rooms)} rooms")
-                
+
                 with st.expander("Parsed brief (JSON)"):
                     st.json(brief.model_dump())
-                
+
+                with st.expander("Room layout coordinates"):
+                    for room in layout:
+                        st.write(f"**{room.name}**: ({room.x:.1f}, {room.y:.1f}) → "
+                                 f"{room.width:.1f}ft × {room.height:.1f}ft "
+                                 f"[{room.zone}]")
+
+                # ✅ Show validation
+                if not result["valid"]:
+                    st.warning("⚠️ Layout issues detected:")
+                    for issue in result["issues"]:
+                        st.write(f"- {issue}")
+                else:
+                    st.success("✅ Layout valid")
+
             except Exception as e:
-                st.error(f"Parsing failed: {e}")
+                st.error(f"Pipeline failed: {e}")
                 st.stop()
 
-        with st.spinner("Allocating areas and checking constraints..."):
-            validated = validate_and_normalize(structured)
-
-        with st.spinner("Generating layout..."):
-            layout = generate_layout(validated)
-            
-            with st.expander("Room layout coordinates"):
-                for room in layout:
-                    st.write(f"**{room.name}**: ({room.x:.1f}, {room.y:.1f}) → "
-                             f"{room.width:.1f}ft × {room.height:.1f}ft "
-                             f"[{room.zone}]")
-
+        # ✅ DXF generation (use brief, not validated)
         with st.spinner("Drafting DXF..."):
             with tempfile.NamedTemporaryFile(suffix=".dxf", delete=False) as tmp:
                 output_path = tmp.name
-            
-            create_dxf(validated, layout, output_path)
-            
+
+            create_dxf(brief, layout, output_path)
+
             with open(output_path, "rb") as f:
                 dxf_bytes = f.read()
             os.unlink(output_path)
 
         st.success("Floor plan generated!")
-        
+
         col1, col2 = st.columns(2)
         with col1:
             st.download_button(
@@ -125,7 +126,6 @@ if st.button("Generate Floor Plan", type="primary"):
                 type="primary"
             )
         with col2:
-            st.info("Open in AutoCAD, LibreCAD, or DraftSight to view. "
-                    "Or drag into AutoCAD Web at autodesk.com/products/autocad/web")
-        
+            st.info("Open in AutoCAD, LibreCAD, or DraftSight")
+
         st.balloons()
