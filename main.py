@@ -48,7 +48,7 @@ default_text = SAMPLES.get(sample_choice, "") if sample_choice != "Custom..." el
 brief_text = st.text_area(
     "Architectural brief:",
     value=default_text,
-    height=100,
+    height=200,
     placeholder="e.g. 3BHK, 1500 sq ft, open kitchen, 1 study, maximize natural light"
 )
 
