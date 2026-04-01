@@ -14,7 +14,31 @@ st.caption("Paste an architectural brief → download a DXF floor plan")
 # Sample briefs for easy demo
 SAMPLES = {
     "3BHK Standard": "3BHK, 1500 sq ft, open kitchen, 1 study, maximize natural light",
-    "2BHK Compact": "2BHK apartment, 900 sq ft, combined living and dining, 1 bathroom, balcony",
+    "2BHK Compact": '''Design a 2BHK flat floor plan (900 sq ft, 30x30 ft) with STRICT requirements:
+
+Rooms (MANDATORY – do not skip any):
+- Living Room: ≥150 sq ft
+- Master Bedroom: ≥120 sq ft WITH attached bathroom (40 sq ft)
+- Second Bedroom: ≥100 sq ft
+- Kitchen: 90 sq ft
+- Common Bathroom: 40 sq ft (accessible from living/corridor)
+- Balcony: 50 sq ft
+
+Bathroom Rules:
+- Bathrooms MUST be clearly labeled as "Toilet/Bath"
+- One bathroom MUST be attached to master bedroom
+- One MUST be common (not inside any bedroom)
+- Each bathroom size MUST be close to 40 sq ft
+- Include door placement
+
+Layout Constraints:
+- No overlapping rooms
+- Rectangular rooms only
+- Proper corridor connectivity
+- Show all dimensions clearly
+- Maintain ventilation (bathrooms on external wall preferred)
+
+Reject output if ANY room is missing.''',
     "4BHK Luxury": "4BHK villa, 3000 sq ft, master bedroom with ensuite, formal living, family lounge, large kitchen, utility room",
 }
 
