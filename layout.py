@@ -1,7 +1,7 @@
 from models import StructuredBrief, RoomLayout
 from typing import List
 import math
-
+from Pipeline import run_pipeline   ✅
 ADJACENCY_RULES = {
     "bedroom": ["bathroom", "corridor"],
     "kitchen": ["dining"],
