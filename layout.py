@@ -310,7 +310,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             room_w = max(room_w, 5)
             
             # Final safety check - clamp all values
-             temp_room.y = max(WALL, min( temp_room.y, plot_d - room_h - WALL))
+            temp_room.y = max(WALL, min( temp_room.y, plot_d - room_h - WALL))
             temp_room.x = max(corridor_x + corridor_width + WALL, min(temp_temp_room.x, plot_w - room_w - WALL))
             room_w = min(room_w, plot_w - temp_room.x - WALL)
             room_h = min(room_h, plot_d -  temp_room.y - WALL)
