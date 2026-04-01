@@ -1,8 +1,8 @@
 # pipeline.py
 
 from constraints import validate_and_normalize, validate_output
-from llm_parser import llm_generate
-from layout_engine import generate_layout
+from parser import llm_generate
+from layout import generate_layout
 
 
 def hard_constraint_check(brief):
