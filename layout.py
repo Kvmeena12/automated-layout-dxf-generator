@@ -297,17 +297,17 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
     layout.append(RoomLayout(
         name="Foyer",
         x=0.5,
-        y=0.5,
+        y=plot_d - 4.5,
         width=6.5,
         height=4,
         zone="public"
     ))
     
     # ===== OVERLAP DETECTION =====
-    # overlaps = check_overlaps(layout)
-    # if overlaps:
-    #     print(f"⚠️  WARNING: {len(overlaps)} overlaps detected:")
-    #     for r1, r2 in overlaps:
-    #         print(f"   - {r1} overlaps with {r2}")
+    overlaps = check_overlaps(layout)
+    if overlaps:
+        print(f"⚠️  WARNING: {len(overlaps)} overlaps detected:")
+        for r1, r2 in overlaps:
+            print(f"   - {r1} overlaps with {r2}")
     
     return layout
