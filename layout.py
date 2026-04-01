@@ -227,15 +227,14 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             room_w = min(room_w, usable_width - WALL)
             
             # LEFT SIDE: Must be to the LEFT of corridor
-            temp_room = RoomLayout(
-    name=room.name,
-    x=0,
-    y=0,
-    width=room_w,
-    height=room_h,
-    zone=zone_name,
-    natural_light=room.natural_light
-)           temp_room.x, temp_room.y = place_room(temp_room, placed_rooms, WALL, left_y)
+            temp_room = RoomLayout(name=room.name,
+                                   x=0,
+                                   y=0,
+                                   width=room_w,
+                                   height=room_h,
+                                   zone=zone_name,
+                                   natural_light=room.natural_light)           
+            temp_room.x, temp_room.y = place_room(temp_room, placed_rooms, WALL, left_y)
             placed_rooms.append(temp_room)
             
             # CRITICAL: Hard boundaries - PRIORITY: STAY WITHIN PLOT
