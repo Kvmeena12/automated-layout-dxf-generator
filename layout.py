@@ -296,7 +296,7 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
     layout.append(RoomLayout(
         name="Foyer",
         x=0.5,
-        y=plot_d - 4.5,
+        y=0.5,
         width=6.5,
         height=4,
         zone="public"
