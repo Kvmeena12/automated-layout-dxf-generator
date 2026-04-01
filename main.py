@@ -3,7 +3,7 @@ import streamlit as st
 import tempfile
 import os
 from cad import create_dxf
-from pipeline import run_pipeline   # ✅ fix import (lowercase)
+from Pipeline import run_pipeline   # ✅ fix import (lowercase)
 
 st.set_page_config(page_title="Brief → Floor Plan", layout="centered")
 st.title("AI Floor Plan Generator")
