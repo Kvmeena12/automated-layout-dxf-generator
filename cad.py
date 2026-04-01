@@ -291,7 +291,8 @@ def create_dxf(brief: StructuredBrief, layout: List[RoomLayout], output_path: st
     doc.layers.add(name="HATCH_PUBLIC",  color=2)
     doc.layers.add(name="HATCH_SERVICE", color=3)
     doc.layers.add(name="HATCH_PRIVATE", color=4)
-    doc.layers.add(name=FURNITURE_LAYER, color=6)
+    if "FURNITURE" not in doc.layers:
+        doc.layers.add(name=FURNITURE_LAYER, color=6)
 
     pw = brief.plot_width_ft
     pd = brief.plot_depth_ft
