@@ -36,7 +36,11 @@ This system:
 
 ---
 
-## Run
+## Tested: 
+- Input : 2BHK flat, 900 sq ft, living room minimum 200 sq ft, master bedroom 
+minimum 150 sq ft, kitchen 100 sq ft, 2 bathrooms each 40 sq ft, 
+balcony 50 sq ft, plot width 25ft, plot depth 40ft
 
-```bash
-python main.py
+- output:
+- ![Click](https://github.com/user-attachments/assets/3cf69001-7147-4224-b23c-a7c7a83e08c3)
+
