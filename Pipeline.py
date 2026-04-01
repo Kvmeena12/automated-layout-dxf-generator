@@ -1,7 +1,7 @@
 # pipeline.py
 
 from constraints import validate_and_normalize, validate_output
-from parser import llm_generate
+from parser import validate_and_fix_brief,parse_brief
 from layout import generate_layout
 
 
@@ -20,7 +20,7 @@ def hard_constraint_check(brief):
 
 def generate_with_retry(prompt, max_retries=3):
     for attempt in range(max_retries):
-        brief = llm_generate(prompt)
+        brief = validate_and_fix_brief(prompt)
 
         valid, msg = hard_constraint_check(brief)
 
