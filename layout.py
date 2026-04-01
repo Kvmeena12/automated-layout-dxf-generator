@@ -19,7 +19,35 @@ ROOM_PRIORITY = {
     "study": 2,
     "balcony": 2,
 }
+def is_overlap(r1, r2):
+    return (
+        r1.x < r2.x + r2.width and
+        r1.x + r1.width > r2.x and
+        r1.y < r2.y + r2.height and
+        r1.y + r1.height > r2.y
+    )
 
+def place_room(room, placed_rooms, start_x, start_y):
+    x, y = start_x, start_y
+
+    while True:
+        overlap = False
+
+        for r in placed_rooms:
+            if is_overlap(room, r):
+                overlap = True
+                break
+
+        if not overlap:
+            return x, y
+
+        # shift right if overlap
+        x += 2
+
+        # if exceeds width → move to next row
+        if x > 30:
+            x = 0
+            y += 2
 def get_room_weight(name):
     """Get priority weight for room sizing"""
     name = name.lower()
@@ -193,8 +221,8 @@ def generate_layout(brief: StructuredBrief) -> List[RoomLayout]:
             room_w = min(room_w, usable_width - WALL)
             
             # LEFT SIDE: Must be to the LEFT of corridor
-            room_x = WALL
-            room_y = left_y + WALL
+            room.x, room.y = place_room(room, placed_rooms, x, y)
+            placed_rooms.append(room)
             
             # CRITICAL: Hard boundaries - PRIORITY: STAY WITHIN PLOT
             # Constrain to plot depth FIRST
