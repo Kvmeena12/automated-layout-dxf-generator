@@ -14,31 +14,71 @@ st.caption("Paste an architectural brief → download a DXF floor plan")
 # Sample briefs for easy demo
 SAMPLES = {
     "3BHK Standard": "3BHK, 1500 sq ft, open kitchen, 1 study, maximize natural light",
-    "2BHK Compact": '''Design a 2BHK flat floor plan (900 sq ft, 30x30 ft) with STRICT requirements:
+    "2BHK Compact": '''Design an optimized 2BHK flat floor plan with strict constraints.
 
-Rooms (MANDATORY – do not skip any):
-- Living Room: ≥150 sq ft
-- Master Bedroom: ≥120 sq ft WITH attached bathroom (40 sq ft)
-- Second Bedroom: ≥100 sq ft
-- Kitchen: 90 sq ft
-- Common Bathroom: 40 sq ft (accessible from living/corridor)
-- Balcony: 50 sq ft
+Total Area: 900 sq ft  
+Plot Size: 30 ft x 30 ft  
+Shape: sqaure  
 
-Bathroom Rules:
-- Bathrooms MUST be clearly labeled as "Toilet/Bath"
-- One bathroom MUST be attached to master bedroom
-- One MUST be common (not inside any bedroom)
-- Each bathroom size MUST be close to 40 sq ft
-- Include door placement
 
-Layout Constraints:
-- No overlapping rooms
-- Rectangular rooms only
-- Proper corridor connectivity
-- Show all dimensions clearly
-- Maintain ventilation (bathrooms on external wall preferred)
+MANDATORY ROOM AREAS
 
-Reject output if ANY room is missing.''',
+- Living Room: 150–180 sq ft (PRIORITY, at entrance)
+- Master Bedroom: 120–140 sq ft with attached bathroom (40 sq ft)
+- Second Bedroom: 100–120 sq ft
+- Kitchen: 90 sq ft (adjacent to living/dining)
+- Common Bathroom: 40 sq ft (accessible from corridor/living)
+- Balcony: 50 sq ft (attached to living room preferred)
+
+SPACE OPTIMIZATION RULES
+
+- Total circulation (corridor + passage) MUST be ≤ 80 sq ft
+- Corridor width: 3 to 4 ft ONLY
+- Efficiency MUST be ≥ 78%
+- Avoid long central corridors
+- Merge foyer into living room if needed (no separate foyer required)
+
+LAYOUT LOGIC (VERY IMPORTANT)
+
+- Entrance → Living Room → Bedrooms → Kitchen (logical flow)
+- Public zone (Living) near entrance
+- Private zone (Bedrooms) away from entrance
+- Service zone (Kitchen + Bathrooms) grouped efficiently
+- Bathrooms should share plumbing wall if possible
+
+
+GEOMETRY & VALIDATION
+
+- All rooms must be rectangular and non-overlapping
+- Each room must display dimensions + area (sq ft)
+- Maintain realistic wall thickness
+- Ensure proper door placement and accessibility
+
+
+VENTILATION & PRACTICALITY
+
+- Each room must have at least one window
+- Bathrooms must be on external walls OR ventilated
+- Ensure furniture feasibility (bed, sofa, kitchen platform)
+
+STRICT VALIDATION
+
+Reject the layout if:
+- Any room is missing
+- Living room <150 sq ft
+- Master bedroom <120 sq ft
+- Any bathroom <35 sq ft
+- Balcony <50 sq ft
+- Circulation area >80 sq ft
+
+
+OUTPUT FORMAT
+
+- Labeled floor plan
+- Each room clearly marked with name + area
+- Include North direction
+- Show dimensions of all rooms
+- Display total usable area and efficiency''',
     "4BHK Luxury": "4BHK villa, 3000 sq ft, master bedroom with ensuite, formal living, family lounge, large kitchen, utility room",
 }
 
