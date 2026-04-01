@@ -5,6 +5,7 @@ from models import RoomLayout, StructuredBrief
 from config import DXF_LAYERS
 from typing import List
 
+
 # True RGB colors — renders correctly in ALL viewers
 ZONE_RGB = {
     "public":  (255, 255, 200),   # warm yellow
@@ -21,7 +22,7 @@ def add_solid_hatch(msp, x, y, w, h, zone, layer):
     rgb = ZONE_RGB.get(zone, (220, 220, 220))
     hatch = msp.add_hatch(dxfattribs={"layer": layer})
     hatch.set_solid_fill()
-    hatch.dxf.true_color = RGB(rgb[0], rgb[1], rgb[2])
+    hatch.dxf.true_color = (255 << 16) + (0 << 8) + 0
     hatch.paths.add_polyline_path(
         [(x, y), (x + w, y), (x + w, y + h), (x, y + h)],
         is_closed=True
